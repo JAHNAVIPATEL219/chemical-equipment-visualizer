@@ -11,7 +11,7 @@ import {
   Legend,
 } from "chart.js";
 
-// Register chart components
+// Register Chart.js components
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -26,18 +26,30 @@ function App() {
   const [loading, setLoading] = useState(false);
 
   const uploadFile = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
     const formData = new FormData();
-    formData.append("file", e.target.files[0]);
+    formData.append("file", file);
 
     setLoading(true);
 
     axios
-      .post("http://127.0.0.1:8000/api/upload/", formData)
+      .post(
+        "https://chemical-equipment-backend-ikow.onrender.com/api/upload/",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      )
       .then((res) => {
         setData(res.data);
         setLoading(false);
       })
-      .catch(() => {
+      .catch((err) => {
+        console.error(err);
         alert("Upload failed");
         setLoading(false);
       });
@@ -58,46 +70,43 @@ function App() {
   return (
     <div style={styles.page}>
       <div style={styles.container}>
-        <h1 style={styles.title}>
-          Chemical Equipment Parameter Visualizer
-        </h1>
+        <h1 style={styles.title}>Chemical Equipment Parameter Visualizer</h1>
         <p style={styles.subtitle}>
           Upload a CSV file to analyze chemical equipment parameters
         </p>
 
-        {/* Upload Box */}
+        {/* Upload Section */}
         <div style={styles.uploadBox}>
-          <input type="file" onChange={uploadFile} />
-          {loading && <p style={{ marginTop: 10 }}>Uploading...</p>}
+          <input type="file" accept=".csv" onChange={uploadFile} />
+          {loading && <p>Uploading...</p>}
         </div>
 
         {data && (
           <>
-          
             {/* Summary Cards */}
             <div style={styles.cards}>
-  <div style={{ ...styles.card, background: "#e8f1fd" }}>
-    <h3>Total Equipment</h3>
-    <p>{data.total}</p>
-  </div>
+              <div style={{ ...styles.card, background: "#e8f1fd" }}>
+                <h3>Total Equipment</h3>
+                <p>{data.total}</p>
+              </div>
 
-  <div style={{ ...styles.card, background: "#e9f7ef" }}>
-    <h3>Avg Flowrate</h3>
-    <p>{data.avg_flowrate.toFixed(2)}</p>
-  </div>
+              <div style={{ ...styles.card, background: "#e9f7ef" }}>
+                <h3>Avg Flowrate</h3>
+                <p>{data.avg_flowrate.toFixed(2)}</p>
+              </div>
 
-  <div style={{ ...styles.card, background: "#fff4e6" }}>
-    <h3>Avg Pressure</h3>
-    <p>{data.avg_pressure.toFixed(2)}</p>
-  </div>
+              <div style={{ ...styles.card, background: "#fff4e6" }}>
+                <h3>Avg Pressure</h3>
+                <p>{data.avg_pressure.toFixed(2)}</p>
+              </div>
 
-  <div style={{ ...styles.card, background: "#fceef3" }}>
-    <h3>Avg Temperature</h3>
-    <p>{data.avg_temperature.toFixed(2)}</p>
-  </div>
-</div>
+              <div style={{ ...styles.card, background: "#fceef3" }}>
+                <h3>Avg Temperature</h3>
+                <p>{data.avg_temperature.toFixed(2)}</p>
+              </div>
+            </div>
 
-            {/* Chart Section */}
+            {/* Chart */}
             <div style={styles.chartBox}>
               <h2>Equipment Type Distribution</h2>
               <Bar data={chartData} />
@@ -114,6 +123,7 @@ export default App;
 /* ======================
    STYLES
 ====================== */
+
 const styles = {
   page: {
     minHeight: "100vh",
@@ -155,12 +165,12 @@ const styles = {
     marginBottom: "40px",
   },
   card: {
-  padding: "20px",
-  borderRadius: "12px",
-  textAlign: "center",
-  boxShadow: "0 6px 14px rgba(0,0,0,0.06)",
-  fontWeight: "500",
-},
+    padding: "20px",
+    borderRadius: "12px",
+    textAlign: "center",
+    boxShadow: "0 6px 14px rgba(0,0,0,0.06)",
+    fontWeight: "500",
+  },
   chartBox: {
     padding: "20px",
     borderRadius: "10px",

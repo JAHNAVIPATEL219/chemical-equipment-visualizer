@@ -1,17 +1,20 @@
 from pathlib import Path
 
+# ======================
+# BASE DIRECTORY
+# ======================
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# ======================
+# SECURITY
+# ======================
 SECRET_KEY = 'django-insecure-v0@__43_!3ks*vydxj$rw-^p0$gqp=0uejar3%5lfr=-nx88!l'
-
 DEBUG = True
-
 ALLOWED_HOSTS = ["*"]
 
 # ======================
 # APPLICATIONS
 # ======================
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -20,7 +23,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'corsheaders',          # ✅ added
+    'corsheaders',          # CORS support
     'rest_framework',
     'equipment',
 ]
@@ -28,9 +31,8 @@ INSTALLED_APPS = [
 # ======================
 # MIDDLEWARE
 # ======================
-# ⚠️ corsheaders.middleware.CorsMiddleware MUST be at the TOP
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',   # ✅ added FIRST
+    'corsheaders.middleware.CorsMiddleware',   # MUST be first
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -41,12 +43,23 @@ MIDDLEWARE = [
 ]
 
 # ======================
-# CORS SETTINGS
+# CORS & CSRF SETTINGS (IMPORTANT)
 # ======================
-CORS_ALLOW_ALL_ORIGINS = True   # ✅ REQUIRED for React ↔ Django
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://chipper-centaur-355a8a.netlify.app"
+]
+
+# ======================
+# URL CONFIG
+# ======================
 ROOT_URLCONF = 'backend.urls'
 
+# ======================
+# TEMPLATES
+# ======================
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -62,6 +75,9 @@ TEMPLATES = [
     },
 ]
 
+# ======================
+# WSGI
+# ======================
 WSGI_APPLICATION = 'backend.wsgi.application'
 
 # ======================
@@ -105,4 +121,7 @@ USE_TZ = True
 # ======================
 STATIC_URL = 'static/'
 
+# ======================
+# DEFAULT PRIMARY KEY
+# ======================
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

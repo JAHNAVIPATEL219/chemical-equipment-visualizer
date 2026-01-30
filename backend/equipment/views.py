@@ -6,14 +6,12 @@ import csv, io
 @csrf_exempt
 @api_view(["POST"])
 def upload_csv(request):
-    file = request.FILES.get("file")
-
-    if not file:
+    if "file" not in request.FILES:
         return Response({"error": "No file uploaded"}, status=400)
 
+    file = request.FILES["file"]
     data = file.read().decode("utf-8")
-    io_string = io.StringIO(data)
-    reader = csv.DictReader(io_string)
+    reader = csv.DictReader(io.StringIO(data))
 
     total = 0
     flowrates = []
@@ -23,13 +21,11 @@ def upload_csv(request):
 
     for row in reader:
         total += 1
-
         flowrates.append(float(row["flowrate"]))
         pressures.append(float(row["pressure"]))
         temperatures.append(float(row["temperature"]))
-
-        eq_type = row["type"]
-        type_distribution[eq_type] = type_distribution.get(eq_type, 0) + 1
+        t = row["type"]
+        type_distribution[t] = type_distribution.get(t, 0) + 1
 
     return Response({
         "total": total,

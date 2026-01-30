@@ -49,8 +49,11 @@ CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://chipper-centaur-355a8a.netlify.app"
+    "https://chipper-centaur-355a8a.netlify.app",
+    "https://*.netlify.app",
+    "https://chemical-equipment-backend-ikow.onrender.com",
 ]
+
 
 # ======================
 # URL CONFIG

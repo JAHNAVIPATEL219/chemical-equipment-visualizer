@@ -1,35 +1,40 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework import status
 from django.views.decorators.csrf import csrf_exempt
-import pandas as pd
+import csv, io
 
 @csrf_exempt
-@api_view(['POST'])
+@api_view(["POST"])
 def upload_csv(request):
-    if 'file' not in request.FILES:
-        return Response(
-            {"error": "No file uploaded"},
-            status=status.HTTP_400_BAD_REQUEST
-        )
+    file = request.FILES.get("file")
 
-    file = request.FILES['file']
+    if not file:
+        return Response({"error": "No file uploaded"}, status=400)
 
-    try:
-        df = pd.read_csv(file)
+    data = file.read().decode("utf-8")
+    io_string = io.StringIO(data)
+    reader = csv.DictReader(io_string)
 
-        result = {
-            "total": len(df),
-            "avg_flowrate": float(df["Flowrate"].mean()),
-            "avg_pressure": float(df["Pressure"].mean()),
-            "avg_temperature": float(df["Temperature"].mean()),
-            "type_distribution": df["Type"].value_counts().to_dict()
-        }
+    total = 0
+    flowrates = []
+    pressures = []
+    temperatures = []
+    type_distribution = {}
 
-        return Response(result, status=status.HTTP_200_OK)
+    for row in reader:
+        total += 1
 
-    except Exception as e:
-        return Response(
-            {"error": str(e)},
-            status=status.HTTP_400_BAD_REQUEST
-        )
+        flowrates.append(float(row["flowrate"]))
+        pressures.append(float(row["pressure"]))
+        temperatures.append(float(row["temperature"]))
+
+        eq_type = row["type"]
+        type_distribution[eq_type] = type_distribution.get(eq_type, 0) + 1
+
+    return Response({
+        "total": total,
+        "avg_flowrate": sum(flowrates) / len(flowrates),
+        "avg_pressure": sum(pressures) / len(pressures),
+        "avg_temperature": sum(temperatures) / len(temperatures),
+        "type_distribution": type_distribution
+    })

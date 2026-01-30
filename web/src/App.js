@@ -35,7 +35,7 @@ function App() {
     setLoading(true);
 
     axios
-      .post("http://127.0.0.1:8000/api/upload/", formData)
+      .post("https://chemical-equipment-backend-ikow.onrender.com/api/upload/", formData)
       .then((res) => {
         setData(res.data);
         setLoading(false);

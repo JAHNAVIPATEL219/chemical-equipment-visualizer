@@ -35,15 +35,7 @@ function App() {
     setLoading(true);
 
     axios
-      .post(
-        "https://chemical-equipment-backend-ikow.onrender.com/api/upload/",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      )
+      .post("http://127.0.0.1:8000/api/upload/", formData)
       .then((res) => {
         setData(res.data);
         setLoading(false);
@@ -70,12 +62,15 @@ function App() {
   return (
     <div style={styles.page}>
       <div style={styles.container}>
-        <h1 style={styles.title}>Chemical Equipment Parameter Visualizer</h1>
+        <h1 style={styles.title}>
+          Chemical Equipment Parameter Visualizer
+        </h1>
+
         <p style={styles.subtitle}>
           Upload a CSV file to analyze chemical equipment parameters
         </p>
 
-        {/* Upload Section */}
+        {/* Upload Box */}
         <div style={styles.uploadBox}>
           <input type="file" accept=".csv" onChange={uploadFile} />
           {loading && <p>Uploading...</p>}

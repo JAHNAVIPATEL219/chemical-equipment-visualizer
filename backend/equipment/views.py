@@ -1,17 +1,35 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework import status
+from django.views.decorators.csrf import csrf_exempt
 import pandas as pd
+
+@csrf_exempt
 @api_view(['POST'])
 def upload_csv(request):
-    file = request.FILES['file']   # uploaded file
-    df = pd.read_csv(file)
+    if 'file' not in request.FILES:
+        return Response(
+            {"error": "No file uploaded"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
-    summary = {
-        "total": len(df),
-        "avg_flowrate": df["Flowrate"].mean(),
-        "avg_pressure": df["Pressure"].mean(),
-        "avg_temperature": df["Temperature"].mean(),
-        "type_distribution": df["Type"].value_counts().to_dict()
-    }
+    file = request.FILES['file']
 
-    return Response(summary)
+    try:
+        df = pd.read_csv(file)
+
+        result = {
+            "total": len(df),
+            "avg_flowrate": float(df["Flowrate"].mean()),
+            "avg_pressure": float(df["Pressure"].mean()),
+            "avg_temperature": float(df["Temperature"].mean()),
+            "type_distribution": df["Type"].value_counts().to_dict()
+        }
+
+        return Response(result, status=status.HTTP_200_OK)
+
+    except Exception as e:
+        return Response(
+            {"error": str(e)},
+            status=status.HTTP_400_BAD_REQUEST
+        )
